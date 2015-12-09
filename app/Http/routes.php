@@ -11,6 +11,9 @@
 |
 */
 
+Route::resource('clientes', 'ClientController');
+Route::resource('facturas', 'InvoiceController');
+
 Route::get('/', function () {
     return view('welcome');
 });

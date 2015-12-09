@@ -148,6 +148,8 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Cviebrock\EloquentSluggable\SluggableServiceProvider::class,
 
+        Laracasts\Flash\FlashServiceProvider::class,
+
     ],
 
     /*
@@ -198,7 +200,8 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
       'Form' => Collective\Html\FormFacade::class,
       'Html' => Collective\Html\HtmlFacade::class,
-
+      'Flash' => Laracasts\Flash\Flash::class,
+      
     ],
 
 ];
