@@ -13,6 +13,11 @@
 
 Route::resource('clientes', 'ClientController');
 Route::resource('facturas', 'InvoiceController');
+Route::resource('detalles', 'InoviceDetailController');
+
+Route::post('hola', [
+    'as' => 'prueba', 'uses' => 'InvoiceController@prueba'
+]);
 
 Route::get('/', function () {
     return view('welcome');
