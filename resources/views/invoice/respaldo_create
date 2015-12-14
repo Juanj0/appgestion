@@ -1,0 +1,495 @@
+@extends('layouts.app')
+
+
+@section('content')
+
+<p><a id="saveInvoice" href="#" >Guardar Factura</a></p>
+
+  <div class="row">
+
+  <div class="col-md-4">
+
+
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Datos del Cliente</h3>
+	  </div>
+	  <div class="panel-body">
+
+			@if (isset( $Invoice->id))
+				{!! Form::open(['route' => ['facturas.update', $Invoice], 'method' => 'PUT', 'id' => 'form_edit']) !!}
+							{!! Form::close() !!}
+
+			@else
+				{!! Form::open(['route' => 'facturas.store', 'method' => 'POST']) !!}
+				{!! Form::close() !!}
+			@endif
+
+		    <div class="form-group">
+				{!! Form::label('client_id', 'Nombre del Cliente'); !!}
+				{!! Form::select('client_id', $Clients, @$Invoice->client_id, ['class' => 'chosen-select form-control', 'placeholder' => 'Seleccione']); !!}
+		    </div>
+
+	  </div>
+	</div>
+
+
+
+  </div>
+
+  <div class="col-md-4">
+
+  </div>
+
+  <div class="col-md-4">
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Datos de la Factura</h3>
+	  </div>
+	  <div class="panel-body">
+
+		    <div class="form-group">
+				{!! Form::label('numero', 'Número'); !!}
+				{!! Form::text('numero', @$Invoice->numero,['class' => 'form-control', 'required']); !!}
+		    </div>
+
+		    <div class="form-group">
+				{!! Form::label('fecha', 'Fecha'); !!}
+				{!! Form::date('fecha', @$Invoice->fecha,['class' => 'form-control']);; !!}
+		    </div>
+
+	  </div>
+	</div>
+
+  </div>
+
+  </div>
+
+
+<div class="row">
+<div class="col-md-12">
+
+	<div class="panel panel-default">
+	  <div class="panel-heading">
+	    <h3 class="panel-title">Detalle de la Factura</h3>
+	  </div>
+	  <div class="panel-body">
+
+	  <table  id="myTable" class="table table-hover">
+	  	<thead>
+            <tr>
+              <th >Producto</th>
+              <th >Descripcion</th>
+              <th >Cant</th>
+              <th >Precio</th>
+              <th >Impuesto</th>
+              <th >Total</th>
+              <th ></th>
+            </tr>
+        </thead>
+        <tbody>
+        	
+
+
+
+            <tr id='tr_0' data-id='0' class='init' >
+
+            {!! Form::open(['route' => 'detalles.store', 'method' => 'POST', 'id' => 'form_0', 'name' => 'form_0']) !!}
+              <td>{!! Form::text('producto', null,['class' => 'form-control', 'required']); !!}</td>
+              <td>{!! Form::textarea('descripcion', null,['class' => 'form-control', 'cols'=>'50' , 'rows'=>'2']); !!}</td>
+              <td>{!! Form::number('cant', null,['class' => 'calculate form-control', 'required']); !!}</td>
+              <td>{!! Form::number('precio', null,['class' => 'calculate form-control', 'required']); !!}</td>
+              <td>{!! Form::number('impuesto', null,['class' => 'calculate form-control', 'required']); !!}</td>
+              <td>{!! Form::number('total', null,['class' => 'calculate form-control', 'required','readonly']); !!}
+              	<div id="loading_0"></div></td>
+            <td>{!! Form::submit('Guardar',['class' => 'saveItem btn btn-xs btn-warning']); !!}</td>
+            {!! Form::close() !!}
+
+            </tr>
+
+          </tbody>
+	  </table>
+
+	  <div>
+		    <div class="form-group">
+				{!! Form::label('subtotal', 'Subtotal'); !!}
+				{!! Form::label('subtotal_mto', '0.00', ['id' => 'subtotal_mto']); !!}
+		    </div>
+
+		    <div class="form-group">
+				{!! Form::label('impuesto', 'Impuesto'); !!}
+				{!! Form::label('impuesto_mto', '0.00', ['id' => 'impuesto_mto']); !!}
+		    </div>
+
+		    <div class="form-group">
+				{!! Form::label('total', 'Total'); !!}
+				{!! Form::label('total_mto', '0.00', ['id' => 'total_mto']); !!}
+		    </div>
+
+	  </div>
+
+		<p><a id="insert-more" href="#" >Agregar Linea</a></p>
+		<p><a id="btnRecorrer" href="#" >Recorrer</a></p>
+
+
+		<p><a id="other" href="#" >AGREGAR REMOTO</a></p>
+		
+		<div id="result_invoice">eeee</div>
+	</div>
+  </div>
+</div>	
+</div>
+
+
+
+<div class="row">
+
+  <div class="col-md-4">
+		{!! Form::label('notas', 'Notas'); !!}
+		{!! Form::textarea('notas', @$Invoice->notas,['class' => 'form-control']); !!}
+  </div>
+
+  <div class="col-md-4">
+		{!! Form::label('terminos', 'Terminos'); !!}
+		{!! Form::textarea('terminos', @$Invoice->terminos,['class' => 'form-control']); !!}
+  </div>
+
+  <div class="col-md-4">
+		{!! Form::label('pie', 'Pie de Página'); !!}
+		{!! Form::textarea('pie', @$Invoice->pie,['class' => 'form-control']); !!}
+  </div>
+
+</div>
+
+
+@endsection
+
+
+
+
+
+
+
+
+
+
+@section('script')
+
+<script >
+
+
+function mCalcular () {
+        //iterate through each textboxes and add keyup
+        //handler to trigger sum event
+        $(".calculate").each(function () {
+            $(this).keyup(function () {
+
+            	var sum_subtotal = 0;
+		        var sum_impuesto = 0;
+	        	var sum_total = 0;
+
+				$("#myTable tbody tr").each(function (index) 
+		        {
+
+		            $(this).children("td").each(function (index2) 
+		            {
+
+		            	switch (index2) 
+		                {
+		                    case 2: 
+		                    		cant = $(this).find('input').val();
+									if($.isNumeric(cant)) {
+									}else {
+										cant = 0;
+									};
+		                            break;
+		                    case 3: 
+
+	                    			precio = $(this).find('input').val();
+									if($.isNumeric(precio)) {
+									}else {
+										precio = 0;
+									};
+		                            break;
+		                    case 4: 
+
+	                    			impuesto = $(this).find('input').val();
+									if($.isNumeric(impuesto)) {
+									}else {
+										impuesto = 0;
+									};
+		                            break;
+
+		                    case 5: 
+									precio_total = cant * precio;
+									impuesto_total = precio_total * (impuesto / 100);
+									total = precio_total + impuesto_total;
+
+									sum_subtotal += precio_total;
+									sum_impuesto+= impuesto_total;
+									sum_total += total;
+
+									$(this).find('input').val(total.toFixed(2));						
+		                            break;
+		                }
+		                
+
+		            })
+				
+				$("#subtotal_mto").text(sum_subtotal.toFixed(2));
+				$("#impuesto_mto").text(sum_impuesto.toFixed(2));
+				$("#total_mto").text(sum_total.toFixed(2));
+		           
+
+		        })
+            });
+        });
+
+
+
+}
+
+
+
+    $(document).ready(function() {
+
+    	$(".chosen-select").select2();
+
+	    $("#myTable").on("keyup", "input[type=number]", function(){
+	    	mCalcular();
+	    });
+
+	    $("body").on("submit", "form", function(){
+	    	alert('Enviando');
+	    });
+
+		$("#myTable").on("click", "input[type=submit]", function(){
+    		event.preventDefault();
+	    	//alert('Accion Prevenida');
+
+	    	var route_edit = "{{ route('detalles.edit', 'ID_ITEM') }}";
+
+	    	var row = $(this).parents('tr');
+	    	var id = row.data('id');
+	    	var mForm = $("form#form_"+id);
+			var route = mForm.attr('action');
+	    	var mserialize = mForm.serialize();
+			var linea = '';
+
+	    	//alert(id);
+	    	//alert(route+'-----------'+mForm.attr('class'));
+	    	//alert(mserialize);
+
+
+			$("#myTable tbody tr#tr_"+id).each(function (index) {
+	            $(this).eq(0).find('input,textarea').each(function (index3){
+	            	if (typeof $(this).attr('name')  !== "undefined"){
+						linea += $(this).attr('name') +'=' + $(this).val() + "&";
+	            	};
+	            });
+			});
+
+
+
+			$("#loading_"+id).empty().html('<button class="btn btn-xs btn-warning"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span></button>');
+
+			$.post( route, linea)
+			  .done(function( data ) {
+
+			  		if (id == 0) {
+				    	$.get( route_edit.replace('ID_ITEM',data), function( data ) {
+					    	$("#myTable tr.init").before(data);
+						});
+						$(mForm).each(function(){
+						    this.reset();
+						});
+			  		}else{
+
+			  		};
+
+			$("#loading_"+id).empty();
+
+			  });
+
+		});
+
+
+    });
+
+
+    	/* Esto Guarda
+    $(".saveItem").click(function (event) {
+
+    	event.preventDefault();
+    	//alert('Accion Prevenida');
+
+    	alert($("#myTable tr.init input[type=submit]").val());
+
+
+    	var route_create = "{{ route('detalles.create') }}";
+    	var route_edit = "{{ route('detalles.edit', 'ID_ITEM') }}";
+
+    	var row = $(this).parents('tr');
+    	var id = row.data('id');
+    	var mForm = $("#form_item");
+		var route = mForm.attr('action');
+    	var mserialize = mForm.serialize();
+
+    	//alert(route_create);
+    	//alert(route);
+    	//alert(mserialize);
+
+
+
+
+		$.post( route, mserialize)
+		  .done(function( data ) {
+		    alert(data);
+		    mForm.attr('action',route_edit.replace('ID_ITEM',data));
+		    alert(mForm.attr('action'));
+		  });
+
+
+
+    	$.get( route_create, function( data ) {
+	    	$("#myTable tr.init").before(data);
+		});
+
+
+    });
+		*/
+
+
+
+
+
+    $( "#saveInvoice" ).click(function () {
+
+		var linea = '';
+    	var mForm = $("form#form_edit");
+		var route = mForm.attr('action');
+
+			$(mForm).each(function (index) {
+	            $(this).find('input').each(function (index3){
+	            	if (typeof $(this).attr('name')  !== "undefined"){
+						linea += $(this).attr('name') +'=' + $(this).val() + "&";
+	            	};
+	            });
+			});
+
+		linea += 'client_id=' + $('#client_id').val() + "&";
+		linea += 'numero=' + $('#numero').val() + "&";
+		linea += 'fecha=' + $('#fecha').val() + "&";
+		linea += 'notas=' + $('#notas').val() + "&";
+		linea += 'terminos=' + $('#terminos').val() + "&";
+		linea += 'pie=' + $('#pie').val() + "";
+		alert(linea);
+
+		$.post( route, linea).done(function( data ) {
+
+				$("#result_invoice").append(data);
+				alert('aholla::: ' + data);
+
+		  }).fail(function(response) {
+			if (response.status == 400) {
+				showErrors($.parseJSON(response.responseText).errors, '#form-status-placeholder');
+			} else {
+				alert('Unknown Error');
+			}
+		});
+
+/*
+		var items = [];
+		var item_order = 30;
+		$('#myTable tbody tr').each(function() {
+			var row = {};
+			$(this).find('input,textarea').each(function() {
+				row[$(this).attr('name')] = $(this).val();
+			});
+			row['item_order'] = item_order;
+			item_order++;
+			items.push(row);
+
+		});
+*/
+		//$.each(items, function( index, value ) {
+		//  alert( index + ": " + value['item_order']);
+		//});
+
+    });
+
+
+
+	 $("#btnRecorrer").click(function () {
+
+	 			var arreglo = '';
+	 			var linea = '';
+
+				$("#myTable tbody tr").each(function (index) 
+		        {
+
+		        	linea = '';
+
+		            $(this).eq(0).find('input,textarea').each(function (index3){
+		            		if (typeof $(this).attr('name')  !== "undefined"){
+								linea += $(this).attr('name') +'=' + $(this).val() + "&";
+		            		};
+		            		
+		            });
+
+
+
+		            alert(linea);
+
+		            /*
+		            $(this).children("td").each(function (index2) 
+		            {
+
+		            	linea += $(this).eq(0).find('input').attr('name') +":"+ $(this).eq(0).find('input').val();
+		            	linea += $(this).eq(1).find('textarea').attr('name') +":"+ $(this).eq(1).find('textarea').val();
+		            	linea += $(this).eq(2).find('input').attr('name') +":"+ $(this).eq(2).find('input').val();
+		            	linea += $(this).eq(3).find('input').attr('name') +":"+ $(this).eq(3).find('input').val();
+		            	linea += $(this).eq(4).find('input').attr('name') +":"+ $(this).eq(4).find('input').val();
+		            	linea += $(this).eq(5).find('input').attr('name') +":"+ $(this).eq(5).find('input').val();
+
+		            });
+					*/
+
+				});
+	
+	});
+
+	 $("#insert-more").click(function () {
+	     $("#myTable").each(function () {
+	         var tds = '<tr>';
+	         jQuery.each($('tr:last td', this), function () {
+	             tds += '<td>' + $(this).html() + '</td>';
+	         });
+
+	         var td_new = '';
+	         td_new = '<tr id="tr_0" data-id="0" class="init">              <td><input class="form-control" required="required" name="producto" type="text"></td>              <td><textarea class="form-control" cols="50" rows="2" name="descripcion"></textarea></td>              <td><input class="calculate form-control" required="required" name="cant" type="number"></td>              <td><input class="calculate form-control" required="required" name="precio" type="number"></td>              <td><input class="calculate form-control" required="required" name="impuesto" type="number"></td>              <td><input class="calculate form-control" required="required" readonly="readonly" name="total" type="number"></td>            <td></td> </tr>';
+
+	         tds += '</tr>';
+	         if ($('tbody', this).length > 0) {
+	             $('tbody', this).append(td_new);
+	         } else {
+	             $(this).append(td_new);
+	         }
+
+	         mCalcular();
+
+	     });
+
+
+
+	});
+
+
+
+
+</script>
+
+
+@endsection
