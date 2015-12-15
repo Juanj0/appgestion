@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.theme')
 
 
 @section('content')
@@ -9,7 +9,7 @@
 	  <div class="panel-heading">Listado de Clientes</div>
 	  <div class="panel-body">
 	    <p>
-			<a href="{{ route('clientes.create') }}" class="btn  btn-info"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Nuevo Cliente</a>
+			<a href="{{ route('clientes.create') }}" class="btn  btn-info"><i class="fa fa-plus"></i> Nuevo Cliente</a>
 	    </p>
 	  </div>
 
@@ -37,13 +37,13 @@
 			  	</td>
  				<td>
 
- 				<a href="{{ route('clientes.edit', $Client->id) }}" class="btn  btn-xs btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
+ 				<a href="{{ route('clientes.edit', $Client->id) }}" class="btn  btn-xs btn-warning"><i class="fa fa-pencil"></i></a>
 
 				 <button type="button" 
 				 data-client_id="{{ $Client->id }}" 
 				 data-client_nombre="{{ $Client->nombre }}" 
 				 data-client_destroy_route="{{ route('clientes.destroy', $Client->id) }}"
-				 class="btn  btn-xs btn-danger" data-toggle="modal" data-target="#confirmDelete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+				 class="btn  btn-xs btn-danger" data-toggle="modal" data-target="#confirmDelete"><i class="fa fa-times"></i></button>
 
                </td>
             </tr>
@@ -51,7 +51,10 @@
           </tbody>
 	  </table>
 	</div>
-	{!! $Clients->render() !!}
+  <div class="media-body">
+	<div  class="pull-right">{!! $Clients->render() !!}</div>
+  </div>
+	
 
 
 <!-- Modal -->

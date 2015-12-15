@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Companies;
 use Laracasts\Flash\Flash;
+use Validator;
 
 class CompanyController extends Controller
 {
@@ -47,6 +48,7 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
+
         $data = new Companies($request->all());
         $data->save();
 
@@ -86,8 +88,19 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        if($request->hasFile('logo')) {
+
+            $file = $request->file('logo');
+            $name = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = public_path('/assets/img');
+            $file->move($path,$name);
+
+        }
+
         $data = Companies::find($id);
         $data->fill($request->all());
+        $data->logo = @$name;
         $data->save();
         Flash::success('Cambios Realizados!');
         return redirect()->route('empresas.edit', $id);

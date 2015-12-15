@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('layouts.theme')
+
 
 
 @section('content')
@@ -278,7 +279,7 @@
  });
 
 
-	$('#confirmDelete').on('show.bs.modal', function(e) {
+$('#confirmDelete').on('show.bs.modal', function(e) {
 	    //get data-id attribute of the clicked element
 	        var mId = $(e.relatedTarget).data('id');
 	        var mNombre = $(e.relatedTarget).data('producto');
